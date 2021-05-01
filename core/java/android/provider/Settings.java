@@ -5136,6 +5136,12 @@ public final class Settings {
         public static final String QS_SB_BG_GRADIENT = "qs_sb_bg_gradient";
 
         /**
+         * Whether to show QS brightness slider on bottom
+         * @hide
+         */
+        public static final String QS_BRIGHTNESS_POSITION_BOTTOM = "qs_brightness_position_bottom";
+
+        /**
          * Double tap on lockscreen to sleep
          * @hide
          */
