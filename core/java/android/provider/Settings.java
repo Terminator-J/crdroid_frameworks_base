@@ -5787,6 +5787,11 @@ public final class Settings {
         /**
          * @hide
          */
+        public static final String UDFPS_COLOR = "udfps_color";
+
+        /**
+         * @hide
+         */
         public static final String UDFPS_ICON = "udfps_icon";
 
         /**

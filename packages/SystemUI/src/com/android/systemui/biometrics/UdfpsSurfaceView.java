@@ -19,18 +19,22 @@ package com.android.systemui.biometrics;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.RectF;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.android.systemui.Dependency;
 import com.android.systemui.R;
+import com.android.systemui.tuner.TunerService;
 
 /**
  * Surface View for providing the Global High-Brightness Mode (GHBM) illumination for UDFPS.
@@ -49,6 +53,8 @@ public class UdfpsSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         void enableGhbm(@NonNull Surface surface, @Nullable Runnable onIlluminatedRunnable);
     }
 
+    static final String UDFPS_COLOR = "system:" + Settings.System.UDFPS_COLOR;
+
     @NonNull private final SurfaceHolder mHolder;
     @NonNull private final Paint mSensorPaint;
 
@@ -58,6 +64,15 @@ public class UdfpsSurfaceView extends SurfaceView implements SurfaceHolder.Callb
     boolean mHasValidSurface;
 
     private Drawable mUdfpsIconPressed;
+    private int mPressedColor;
+    private final int[] PRESSED_COLOR = {
+        R.drawable.udfps_icon_pressed,
+        R.drawable.udfps_icon_pressed_white,
+        R.drawable.udfps_icon_pressed_cyan,
+        R.drawable.udfps_icon_pressed_green,
+        R.drawable.udfps_icon_pressed_yellow,
+        R.drawable.udfps_icon_pressed_light_yellow
+    };
 
     public UdfpsSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -77,7 +92,14 @@ public class UdfpsSurfaceView extends SurfaceView implements SurfaceHolder.Callb
         mSensorPaint.setColor(context.getColor(R.color.config_udfpsColor));
         mSensorPaint.setStyle(Paint.Style.FILL);
 
-        mUdfpsIconPressed = context.getDrawable(R.drawable.udfps_icon_pressed);
+        TunerService.Tunable tunable = (key, newValue) -> {
+            if (UDFPS_COLOR.equals(key)) {
+                mPressedColor =
+                        TunerService.parseInteger(newValue, 0);
+            }
+        };
+        Dependency.get(TunerService.class).addTunable(tunable, UDFPS_COLOR);
+        mUdfpsIconPressed = context.getDrawable(PRESSED_COLOR[mPressedColor]);
     }
 
     @Override public void surfaceCreated(SurfaceHolder holder) {
