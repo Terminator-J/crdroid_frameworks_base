@@ -845,6 +845,9 @@ public final class PowerManagerService extends SystemService
     private static String mPowerInputSuspendSysfsNode;
     private static String mPowerInputSuspendValue;
     private static String mPowerInputResumeValue;
+    private static String mPowerInputSuspendSysfsNode2;
+    private static String mPowerInputSuspendValue2;
+    private static String mPowerInputResumeValue2;
 
     /**
      * All times are in milliseconds. These constants are kept synchronized with the system
@@ -1544,6 +1547,12 @@ public final class PowerManagerService extends SystemService
                 com.android.internal.R.string.config_smartChargingSuspendValue);
         mPowerInputResumeValue = resources.getString(
                 com.android.internal.R.string.config_smartChargingResumeValue);
+        mPowerInputSuspendSysfsNode2 = resources.getString(
+                com.android.internal.R.string.config_smartChargingSysfsNode2);
+        mPowerInputSuspendValue2 = resources.getString(
+                com.android.internal.R.string.config_smartChargingSuspendValue2);
+        mPowerInputResumeValue2 = resources.getString(
+                com.android.internal.R.string.config_smartChargingResumeValue2);
     }
 
     @GuardedBy("mLock")
@@ -2668,6 +2677,13 @@ public final class PowerManagerService extends SystemService
             } catch (IOException e) {
                 Slog.e(TAG, "failed to write to " + mPowerInputSuspendSysfsNode);
             }
+            if ((mPowerInputSuspendSysfsNode2 != null) && (mPowerInputResumeValue2 != null) && (mPowerInputSuspendValue2 != null)) {
+                try {
+                    FileUtils.stringToFile(mPowerInputSuspendSysfsNode2, mPowerInputResumeValue2);
+                } catch (IOException e) {
+                    Slog.e(TAG, "failed to write to " + mPowerInputSuspendSysfsNode2);
+                }
+            }
             return;
         }
 
@@ -2686,6 +2702,13 @@ public final class PowerManagerService extends SystemService
                 mPowerInputSuspended = true;
             } catch (IOException e) {
                     Slog.e(TAG, "failed to write to " + mPowerInputSuspendSysfsNode);
+            }
+            if ((mPowerInputSuspendSysfsNode2 != null) && (mPowerInputResumeValue2 != null) && (mPowerInputSuspendValue2 != null)) {
+                try {
+                    FileUtils.stringToFile(mPowerInputSuspendSysfsNode2, mPowerInputSuspendValue2);
+                } catch (IOException e) {
+                        Slog.e(TAG, "failed to write to " + mPowerInputSuspendSysfsNode2);
+                }
             }
         }
     }
