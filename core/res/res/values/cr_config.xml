@@ -154,4 +154,7 @@
 
     <!-- Parallel space blocklist -->
     <string-array name="config_parallelSpaceBlocklist" />
+
+    <!-- Boost Framework -->
+    <bool name="config_supportsBoostFramework">false</bool>
 </resources>
