@@ -17,6 +17,8 @@
 
 package com.android.systemui.qs.tiles;
 
+import static com.android.internal.logging.MetricsLogger.VIEW_UNKNOWN;
+
 import static lineageos.hardware.LiveDisplayManager.FEATURE_MANAGED_OUTDOOR_MODE;
 import static lineageos.hardware.LiveDisplayManager.MODE_AUTO;
 import static lineageos.hardware.LiveDisplayManager.MODE_DAY;
@@ -33,21 +35,31 @@ import android.content.res.TypedArray;
 import android.database.ContentObserver;
 import android.hardware.display.ColorDisplayManager;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.UserHandle;
 import android.service.quicksettings.Tile;
+import android.view.View;
 
+import androidx.annotation.Nullable;
+
+import com.android.internal.logging.MetricsLogger;
 import com.android.internal.util.ArrayUtils;
+import com.android.systemui.dagger.qualifiers.Background;
+import com.android.systemui.dagger.qualifiers.Main;
+import com.android.systemui.plugins.ActivityStarter;
+import com.android.systemui.plugins.FalsingManager;
 import com.android.systemui.plugins.qs.QSTile.LiveDisplayState;
+import com.android.systemui.plugins.statusbar.StatusBarStateController;
 import com.android.systemui.qs.QSHost;
+import com.android.systemui.qs.logging.QSLogger;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
 
-import org.lineageos.internal.logging.LineageMetricsLogger;
-import org.lineageos.platform.internal.R;
+import javax.inject.Inject;
 
 import lineageos.hardware.LiveDisplayManager;
 import lineageos.providers.LineageSettings;
 
-import javax.inject.Inject;
+import org.lineageos.platform.internal.R;
 
 /** Quick settings tile: LiveDisplay mode switcher **/
 public class LiveDisplayTile extends QSTileImpl<LiveDisplayState> {
@@ -75,8 +87,18 @@ public class LiveDisplayTile extends QSTileImpl<LiveDisplayState> {
     private static final int OFF_TEMPERATURE = 6500;
 
     @Inject
-    public LiveDisplayTile(QSHost host) {
-        super(host);
+    public LiveDisplayTile(
+            QSHost host,
+            @Background Looper backgroundLooper,
+            @Main Handler mainHandler,
+            FalsingManager falsingManager,
+            MetricsLogger metricsLogger,
+            StatusBarStateController statusBarStateController,
+            ActivityStarter activityStarter,
+            QSLogger qsLogger
+    ) {
+        super(host, backgroundLooper, mainHandler, falsingManager, metricsLogger,
+                statusBarStateController, activityStarter, qsLogger);
         mNightDisplayAvailable = ColorDisplayManager.isNightDisplayAvailable(mContext);
         Resources res = mContext.getResources();
         TypedArray typedArray = res.obtainTypedArray(R.array.live_display_drawables);
@@ -84,6 +106,7 @@ public class LiveDisplayTile extends QSTileImpl<LiveDisplayState> {
         for (int i = 0; i < mEntryIconRes.length; i++) {
             mEntryIconRes[i] = typedArray.getResourceId(i, 0);
         }
+
         typedArray.recycle();
 
         updateEntries();
@@ -157,7 +180,7 @@ public class LiveDisplayTile extends QSTileImpl<LiveDisplayState> {
     }
 
     @Override
-    protected void handleClick() {
+    protected void handleClick(@Nullable View view) {
         changeToNextMode();
     }
 
@@ -174,7 +197,7 @@ public class LiveDisplayTile extends QSTileImpl<LiveDisplayState> {
 
     @Override
     public int getMetricsCategory() {
-        return LineageMetricsLogger.TILE_LIVE_DISPLAY;
+        return VIEW_UNKNOWN;
     }
 
     @Override
@@ -185,11 +208,6 @@ public class LiveDisplayTile extends QSTileImpl<LiveDisplayState> {
     @Override
     public Intent getLongClickIntent() {
         return DISPLAY_SETTINGS;
-    }
-
-    @Override
-    protected String composeChangeAnnouncement() {
-        return mAnnouncementEntries[getCurrentModeIndex()];
     }
 
     private int getCurrentModeIndex() {
