@@ -78,8 +78,6 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
             "system:" + Settings.System.STATUS_BAR_BATTERY_STYLE;
     public static final String QS_BATTERY_STYLE =
             "system:" + Settings.System.QS_BATTERY_STYLE;
-    public static final String QS_BATTERY_LOCATION =
-            "system:" + Settings.System.QS_BATTERY_LOCATION;
     private static final String QS_SHOW_BATTERY_PERCENT =
             "system:" + Settings.System.QS_SHOW_BATTERY_PERCENT;
     private static final String QS_SHOW_BATTERY_ESTIMATE =
@@ -147,7 +145,7 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
 
     private boolean mUseCombinedQSHeader;
 
-    private int mStatusBarBatteryStyle, mQSBatteryStyle, mQSBatteryLocation;
+    private int mStatusBarBatteryStyle, mQSBatteryStyle;
 
     public QuickStatusBarHeader(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -210,7 +208,6 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
         Dependency.get(TunerService.class).addTunable(this,
                 STATUS_BAR_BATTERY_STYLE,
                 STATUS_BAR_CLOCK,
-                QS_BATTERY_LOCATION,
                 QS_BATTERY_STYLE,
                 QS_HEADER_IMAGE,
                 QS_SHOW_BATTERY_ESTIMATE,
@@ -455,8 +452,7 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
     }
 
     void setChipVisibility(boolean visibility) {
-        boolean showBattery = mQSBatteryLocation == 1
-                && (mBatteryIcon.getBatteryStyle() != 5
+        boolean showBattery = (mBatteryIcon.getBatteryStyle() != 5
                 || mBatteryIcon.getBatteryEstimate() != 0);
         if (showBattery) {
             mBatteryIcon.setVisibility(visibility ? View.GONE : View.VISIBLE);
@@ -678,10 +674,7 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
     }
 
     public BatteryMeterView getBatteryMeterView() {
-        if (mQSBatteryLocation == 0) {
-            return mBatteryRemainingIcon;
-        }
-        return mBatteryIcon;
+        return mBatteryRemainingIcon;
     }
 
     @Override
@@ -707,18 +700,6 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
                 mStatusBarBatteryStyle =
                         TunerService.parseInteger(newValue, 0);
                 updateBatteryStyle();
-                break;
-            case QS_BATTERY_LOCATION:
-                mQSBatteryLocation =
-                        TunerService.parseInteger(newValue, 0);
-                if (mQSBatteryLocation == 0) {
-                    mBatteryIcon.setVisibility(View.GONE);
-                    mBatteryRemainingIcon.setVisibility(View.VISIBLE);
-                } else {
-                    mBatteryRemainingIcon.setVisibility(View.GONE);
-                    mBatteryIcon.setVisibility(View.VISIBLE);
-                }
-                setChipVisibility(mPrivacyChip.getVisibility() == View.VISIBLE);
                 break;
             case QS_SHOW_BATTERY_PERCENT:
                 mBatteryRemainingIcon.setBatteryPercent(
