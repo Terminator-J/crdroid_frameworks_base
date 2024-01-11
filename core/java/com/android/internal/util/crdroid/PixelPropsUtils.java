@@ -285,7 +285,7 @@ public class PixelPropsUtils {
                 setPropValue(key, value);
             }
             if (packageName.equals("com.google.android.gms") &&
-                    SystemProperties.getBoolean(SPOOF_PIXEL_GMS, true)) {
+                    !SystemProperties.getBoolean(SPOOF_PIXEL_GMS, false)) {
                 setPropValue("TIME", System.currentTimeMillis());
                 final String processName = Application.getProcessName();
                 if (processName.toLowerCase().contains("unstable")
