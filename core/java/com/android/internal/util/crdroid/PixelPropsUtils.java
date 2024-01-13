@@ -256,7 +256,7 @@ public class PixelPropsUtils {
                 } else {
                     propsToChange.putAll(propsToChangePixel5);
                 }
-            } else if (packageName.equals("com.netflix.mediaclient") && 
+            } else if (packageName.equals("com.netflix.mediaclient") &&
                         !SystemProperties.getBoolean(SPOOF_PIXEL_NETFLIX, false)) {
                     if (DEBUG) Log.d(TAG, "Netflix spoofing disabled by system prop");
                     return;
@@ -286,7 +286,7 @@ public class PixelPropsUtils {
             }
             if (packageName.equals("com.google.android.gms") &&
                     !SystemProperties.getBoolean(SPOOF_PIXEL_GMS, false)) {
-                setPropValue("TIME", System.currentTimeMillis());
+                setPropValue("TIME", java.lang.System.currentTimeMillis());
                 final String processName = Application.getProcessName();
                 if (processName.toLowerCase().contains("unstable")
                     || processName.toLowerCase().contains("instrumentation")) {
