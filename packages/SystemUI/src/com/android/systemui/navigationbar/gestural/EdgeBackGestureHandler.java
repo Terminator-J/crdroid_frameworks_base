@@ -313,8 +313,8 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
     private boolean mBlockedGesturalNavigation;
     private boolean mIsBackGestureArrowEnabled;
     private boolean mIsEdgeHapticEnabled;
-    
-    private TunerService mTunerService;
+
+    public TunerService mEdgeLongSwipeTunerService;
 
     private final NavigationEdgeBackPlugin.BackCallback mBackCallback =
             new NavigationEdgeBackPlugin.BackCallback() {
@@ -571,7 +571,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         if (mMLEnableWidth > mEdgeWidthRight) mMLEnableWidth = mEdgeWidthRight;
         if (mMLEnableWidth > mEdgeWidthLeft) mMLEnableWidth = mEdgeWidthLeft;
 
-        mTunerService = Dependency.get(TunerService.class);
+        mEdgeLongSwipeTunerService = Dependency.get(TunerService.class);
 
         // Reduce the default touch slop to ensure that we can intercept the gesture
         // before the app starts to react to it.
@@ -620,8 +620,8 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         }
         updateIsEnabled();
         mUserTracker.addCallback(mUserChangedCallback, mMainExecutor);
-        mTunerService.addTunable(this, KEY_EDGE_LONG_SWIPE_ACTION);
-        mTunerService.addTunable(this, BACK_GESTURE_HEIGHT);
+        mEdgeLongSwipeTunerService.addTunable(this, KEY_EDGE_LONG_SWIPE_ACTION);
+        mEdgeLongSwipeTunerService.addTunable(this, BACK_GESTURE_HEIGHT);
     }
 
     /**
@@ -634,7 +634,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
         mInputManager.unregisterInputDeviceListener(mInputDeviceListener);
         updateIsEnabled();
         mUserTracker.removeCallback(mUserChangedCallback);
-        mTunerService.removeTunable(this);
+        mEdgeLongSwipeTunerService.removeTunable(this);
     }
 
     /**
